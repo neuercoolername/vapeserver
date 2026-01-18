@@ -35,8 +35,7 @@ endif
 
 TTY  := $(PWD)/slipVirtTTY
 PORT := 4290
-PYOCDFLAGS := -t $(MODEL) -f 24m --elf $(BIN)/$(TARGET).elf
-
+PYOCDFLAGS := --target py32f002bx5 --pack ~/Puya.PY32F0xx_DFP.*.pack -M attach -f 10000 --elf $(BIN)/$(TARGET).elf
 
 # Compiler Flags
 CFLAGS  := -g -Os -flto $(CPUARCH) -DF_CPU=$(F_CPU) -I$(SOURCE) -I. -I$(LIB) -I$(LIB)/uip
@@ -100,7 +99,7 @@ $(FSPATH)/fsdata.c: $(FSFILES) $(FSPATH)/fs/index.html.gz
 
 flash:	$(BIN)/$(TARGET).bin
 	@echo "Uploading to MCU ..."
-	@pyocd load -t $(MODEL) -f 1m $(BIN)/$(TARGET).bin
+	@pyocd load --target py32f002bx5 --pack ./Puya.PY32F0xx_DFP.*.pack -M attach -f 10000 $(BIN)/$(TARGET).bin
 
 connect:
 	@pyocd gdb --persist -S -O semihost_console_type=console $(PYOCDFLAGS)
@@ -137,4 +136,38 @@ speedtest:
 clean:
 	@echo "Cleaning all up ..."
 	rm -rf $(BIN)
+# Debug and testing commands
+tcpdump:
+	sudo tcpdump -i sl0 -n -vv
 
+tcpdump-log:
+	@mkdir -p logs
+	sudo tcpdump -i sl0 -n -vv -w logs/capture_$(shell date +%Y%m%d_%H%M%S).pcap
+
+ping:
+	ping -c 5 192.168.190.2
+
+curl:
+	curl --compressed -v http://192.168.190.2
+
+curl-loop:
+	@echo "Testing connection reliability (Ctrl+C to stop)..."
+	@i=1; while true; do \
+		echo "\n=== Test $$i ===" ; \
+		curl --compressed --max-time 5 -s http://192.168.190.2 && echo " ✓ Success" || echo " ✗ Failed" ; \
+		i=$$((i+1)); \
+		sleep 2; \
+	done
+
+test: ping curl
+
+status:
+	@echo "=== VapeServer Status ==="
+	@echo "pyOCD running:" ; ps aux | grep -v grep | grep "pyocd gdb" > /dev/null && echo "  ✓ Yes" || echo "  ✗ No"
+	@echo "socat running:" ; ps aux | grep -v grep | grep "socat.*4290" > /dev/null && echo "  ✓ Yes" || echo "  ✗ No"
+	@echo "slattach running:" ; ps aux | grep -v grep | grep slattach > /dev/null && echo "  ✓ Yes" || echo "  ✗ No"
+	@echo "sl0 interface:" ; ip addr show sl0 > /dev/null 2>&1 && echo "  ✓ Up" || echo "  ✗ Down"
+	@echo "slipVirtTTY exists:" ; test -L $(TTY) && echo "  ✓ Yes" || echo "  ✗ No"
+
+gdb-connect:
+	gdb-multiarch -ex 'file $(BIN)/$(TARGET).elf' -ex 'target remote localhost:3333' -ex 'continue'
