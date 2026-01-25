@@ -1,6 +1,7 @@
 ## installation of vapegateway
 ### Build Rasberry OS Lite via Rasberry Imager
 User: `vape`
+
 Hostname: `vape-gateway-X`
 ### Install Software
 General System Update
@@ -28,9 +29,10 @@ sudo apt update
 sudo apt install cloudflared
 ```
 ### Cloudflare Configuration
-TOOO
+TODO
 
 ### Gateway Konfiguration
+TODO
 #### idea
 - run pyocd / semihosting as a systemd unit
 - run socat as a systemd unit
