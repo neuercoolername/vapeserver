@@ -8,10 +8,11 @@ General System Update
 ```bash
 sudo apt update
 sudo apt upgrade
+sudo apt install vim gdb-multiarch libffi-dev
 ```
 pyocd
 ```bash
-apt install libffi-dev # dependency. without pyocd cannot be installed
+# note the dependency on libffi-dev. without pyocd cannot be installed
 python -m venv .venv
 source .venv/bin/activate
 python -m pip install -U pyocd
