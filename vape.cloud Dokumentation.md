@@ -1,8 +1,8 @@
 ## installation of vapegateway
 ### Build Rasberry OS Lite via Rasberry Imager
 User: `vape`
-
 Hostname: `vape-gateway-X`
+
 ### Install Software
 General System Update
 ```bash
@@ -33,8 +33,19 @@ sudo apt install cloudflared
 TODO
 
 ### Gateway Konfiguration
-TODO
-#### idea
-- run pyocd / semihosting as a systemd unit
-- run socat as a systemd unit
-- run slattach 
+The script `vape-connector.sh` starts all the necessary commands. The service `vape-connector.service` starts the connector script.
+#### install service
+```bash
+# Make wrapper executable
+chmod +x /home/vape/vapeserver/vape-connector.sh
+# Install systemd unit
+sudo cp /home/vape/vapeserver/vape-connector.service /etc/systemd/system/vape-connector.service
+# Reload systemd units,  enable at boot and start vape-commector
+sudo systemctl daemon-reload
+sudo systemctl enable vape-connector.service
+sudo systemctl start vape-connector.service
+```
+#### view logs
+```bash
+journalctl -u vape-connector.service -f
+```

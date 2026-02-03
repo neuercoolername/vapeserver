@@ -53,7 +53,7 @@ sleep 5
 echo "vape-connector: starting slattach"
 sudo slattach -L -p slip -s 115200 "$TTY" &
 
-echo "setup sl0 interface"
+echo "vape-connector: setup sl0 interface"
 sudo ip addr add 192.168.190.1 peer 192.168.190.2/24 dev sl0 && \
 sudo ip link set mtu 1500 up dev sl0
 
