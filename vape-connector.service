@@ -1,0 +1,35 @@
+[Unit]
+Description=Vape Connector Service
+After=systemd-udevd.service
+Wants=systemd-udevd.service
+
+[Service]
+Type=simple
+User=vape
+Group=vape
+
+WorkingDirectory=/home/vape/vapeserver
+ExecStart=/home/vape/vapeserver/vape-connector.sh
+
+# Restart whole stack on any failure (including USB disconnects)
+Restart=always
+RestartSec=3
+TimeoutStartSec=0
+
+# Kill all child processes together
+KillMode=control-group
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=vape-connector
+LogLevelMax=notice
+
+# Hardening (safe with current setup)
+PrivateTmp=yes
+ProtectSystem=full
+ProtectHome=read-only
+ReadWritePaths=/home/vape/vapeserver
+
+[Install]
+WantedBy=multi-user.target
