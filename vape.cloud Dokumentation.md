@@ -30,8 +30,15 @@ sudo apt update
 sudo apt install cloudflared
 ```
 ### Cloudflare Configuration
-TODO
-
+#### install tunnel
+```bash
+cloudflared tunnel login
+# copy cmd from cloudflare page
+cloudflared service install <token>
+```
+#### configuration in cloudflare
+- create connector
+- TODO
 ### Gateway Konfiguration
 The script `vape-connector.sh` starts all the necessary commands. The service `vape-connector.service` starts the connector script.
 #### install service
